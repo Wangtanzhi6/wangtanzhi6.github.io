@@ -1,34 +1,28 @@
-# 站点基本信息
+
 title: 王叹之的博客
 description: 记录技术与生活 | Crypto
 url: https://wangtanzhi6.github.io
 locale: zh-CN
 
-# 使用 Minimal Mistakes 且指定稳定版本（防止 404 构建失败）
 remote_theme: mmistakes/minimal-mistakes@4.24.0
 
-# 允许的插件（GitHub Pages 官方支持的）
 plugins:
   - jekyll-include-cache
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
 
-# Markdown 配置
 markdown: kramdown
 kramdown:
   input: GFM
 highlighter: rouge
 
-# 分页
 paginate: 5
 paginate_path: /page:num/
 
-# 需要包含的目录（导航页面）
 include:
   - _pages
 
-# 默认文章设置
 defaults:
   - scope:
       path: ""
@@ -41,13 +35,11 @@ defaults:
       read_time: true
       comments: true
 
-# 作者信息
 author:
-  name: 王谈之
+  name: 王叹之
   bio: 写代码 / 写wp / 记录
   location: 中国
 
-# 底部社交链接
 footer:
   links:
     - label: GitHub
@@ -57,12 +49,7 @@ footer:
       icon: "fas fa-envelope"
       url: mailto:your-email@example.com
 
-# 主题皮肤（可选值：default, air, contrast 等）
 minimal_mistakes_skin: default
 
-# SEO & Feed
 atom_feed:
   hide: false
-
-# 导航栏（对应 _data/navigation.yml）
-# 如果你已经在 _data/navigation.yml 写了导航，可以忽略这里
