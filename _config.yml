@@ -1,0 +1,61 @@
+title: 王叹之的博客
+description: 记录技术与生活 | Crypto
+url: https://wangtanzhi6.github.io
+locale: zh-CN
+
+# 使用 Minimal Mistakes 远程主题
+remote_theme: mmistakes/minimal-mistakes@latest
+
+# GitHub Pages 允许的插件
+plugins:
+  - jekyll-include-cache
+  - jekyll-seo-tag
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Markdown & 高亮
+markdown: kramdown
+kramdown:
+  input: GFM
+highlighter: rouge
+
+# 分页
+paginate: 5
+paginate_path: /page:num/
+
+# 导航栏
+include:
+  - _pages
+
+# 默认设置：所有 posts 使用单栏布局、开启作者信息与目录
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      toc: true
+      toc_sticky: true
+      read_time: true
+      comments: true
+
+# 作者信息（侧边栏）
+author:
+  name: 王叹之
+  bio: 写代码/写wp/记录
+  avatar: # 可替换你的头像
+
+# 社交（可按需添加）
+footer:
+  links:
+    - label: GitHub
+      icon: "fab fa-github"
+      url: https://github.com/wangtanzhi6
+
+# 主题皮肤（可选：default, air, contrast 等）
+minimal_mistakes_skin: default
+
+# Feed/SEO
+atom_feed:
+  hide: false
