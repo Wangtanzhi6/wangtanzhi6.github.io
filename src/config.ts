@@ -167,6 +167,7 @@ export const siteConfig: SiteConfig = {
 			subtitle: [
 				"今でもあなたは私の光",
 				"这位置不错",
+				"离散？？"
 			],
 			typewriter: {
 				enable: true, // 启用副标题打字机效果
