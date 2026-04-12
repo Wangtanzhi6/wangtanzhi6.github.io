@@ -34,7 +34,7 @@ export const siteConfig: SiteConfig = {
 	lang: SITE_LANG,
 
 	themeColor: {
-		hue: 240, // 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
+		hue: 286, // 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
 		fixed: false, // 对访问者隐藏主题色选择器
 	},
 
@@ -524,13 +524,13 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 动画延迟时间
 			animationDelay: 50,
 		},
-		{
+		/*{
 			// 组件类型：侧栏音乐组件
 			type: "music-sidebar",
 			position: "sticky",
 			class: "onload-animation",
 			animationDelay: 100,
-		},
+		},*/
 		{
 			// 组件类型：分类组件
 			type: "categories",
