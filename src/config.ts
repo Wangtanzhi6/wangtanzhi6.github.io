@@ -87,7 +87,7 @@ export const siteConfig: SiteConfig = {
 	},
 
 	anime: {
-		mode: "meting", // 番剧页面模式："bangumi" 使用Bangumi API，"local" 使用本地配置，"bilibili" 使用Bilibili API
+		mode: "local", // 番剧页面模式："bangumi" 使用Bangumi API，"local" 使用本地配置，"bilibili" 使用Bilibili API
 	},
 
 	// 文章列表布局配置
