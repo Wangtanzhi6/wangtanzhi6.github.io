@@ -276,7 +276,7 @@ export const navBarConfig: NavBarConfig = {
 			children: [
 				{
 					name: "GitHub",
-					url: "https://github.com/LyraVoid/Mizuki",
+					url: "https://github.com/Wangtanzhi6",
 					external: true,
 					icon: "fa7-brands:github",
 				},
@@ -286,15 +286,15 @@ export const navBarConfig: NavBarConfig = {
 					external: true,
 					icon: "fa7-brands:bilibili",
 				},
-				{
+				/*{
 					name: "Gitee",
 					url: "https://gitee.com/matsuzakayuki/Mizuki",
 					external: true,
 					icon: "mdi:git",
-				},
+				},*/
 			],
 		},
-		{
+		/*{
 			name: "My",
 			url: "/content/",
 			icon: "material-symbols:person",
@@ -355,14 +355,14 @@ export const navBarConfig: NavBarConfig = {
 					icon: "material-symbols:timeline",
 				},
 			],
-		},
+		},*/
 	],
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/avatar.webp", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
-	name: "まつざか ゆき",
-	bio: "世界は大きい、君は行かなければならない",
+	avatar: "assets/images/avatar1.webp", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
+	name: "Wangtanzhi",
+	bio: "ヾ(❀╹◡╹)ﾉ~",
 	typewriter: {
 		enable: true, // 启用个人简介打字机效果
 		speed: 80, // 打字速度（毫秒）
@@ -371,19 +371,19 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "Bilibili",
 			icon: "fa7-brands:bilibili",
-			url: "https://space.bilibili.com/701864046",
+			url: "https://space.bilibili.com/383940966",
 		},
-		{
+		/*{
 			name: "Gitee",
 			icon: "mdi:git",
 			url: "https://gitee.com/matsuzakayuki",
-		},
+		},*/
 		{
 			name: "GitHub",
 			icon: "fa7-brands:github",
-			url: "https://github.com/matsuzaka-yuki",
+			url: "https://github.com/Wangtanzhi6",
 		},
-		{
+		/*{
 			name: "Codeberg",
 			icon: "simple-icons:codeberg",
 			url: "https://codeberg.org",
@@ -392,7 +392,7 @@ export const profileConfig: ProfileConfig = {
 			name: "Discord",
 			icon: "fa7-brands:discord",
 			url: "https://discord.gg/MqW6TcQtVM",
-		},
+		},*/
 	],
 };
 
