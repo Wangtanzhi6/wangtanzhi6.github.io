@@ -46,7 +46,7 @@ export const siteConfig: SiteConfig = {
 		projects: false, // 项目页面开关
 		skills: false, // 技能页面开关
 		timeline: false, // 时间线页面开关
-		albums: false, // 相册页面开关（已关闭）
+		albums: false, // 相册页面开关
 		devices: false, // 设备页面开关
 	},
 
@@ -55,7 +55,7 @@ export const siteConfig: SiteConfig = {
 		// 显示模式："text-icon" 显示图标+文本，"logo" 仅显示Logo
 		mode: "text-icon",
 		// 顶栏标题文本
-		text: "MizukiUI",
+		text: "Wangtanzhi",
 		// 顶栏标题图标路径，默认使用 public/assets/home/home.webp
 		icon: "assets/home/home.webp",
 		// 网站Logo图片路径
@@ -466,7 +466,7 @@ export const shareConfig: ShareConfig = {
 };
 
 export const announcementConfig: AnnouncementConfig = {
-	title: "", // 公告标题，填空使用i18n字符串Key.announcement
+	title: "公告公告", // 公告标题，填空使用i18n字符串Key.announcement
 	content: "我草莓招了", // 公告内容
 	closable: true, // 允许用户关闭公告
 	link: {
