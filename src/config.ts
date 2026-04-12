@@ -46,7 +46,7 @@ export const siteConfig: SiteConfig = {
 		projects: true, // 项目页面开关
 		skills: true, // 技能页面开关
 		timeline: true, // 时间线页面开关
-		albums: true, // 相册页面开关
+		albums: false, // 相册页面开关（已关闭）
 		devices: true, // 设备页面开关
 	},
 
@@ -311,11 +311,6 @@ export const navBarConfig: NavBarConfig = {
 					name: "Diary",
 					url: "/diary/",
 					icon: "material-symbols:book",
-				},
-				{
-					name: "Gallery",
-					url: "/albums/",
-					icon: "material-symbols:photo-library",
 				},
 				{
 					name: "Devices",
