@@ -162,10 +162,10 @@ export const siteConfig: SiteConfig = {
 
 		homeText: {
 			enable: true, // 在主页显示自定义文本
-			title: "给给给给给我一个接口", // 主页横幅主标题
+			title: "谁还有多余资金", // 主页横幅主标题
 
 			subtitle: [
-				"今でもあなたは私の光",
+				"品味不错我的朋友",
 				"这位置不错",
 				"离散？？"
 			],
