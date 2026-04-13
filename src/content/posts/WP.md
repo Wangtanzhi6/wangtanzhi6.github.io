@@ -1,5 +1,5 @@
 ---
-title: 这是WP
+title: WP
 published: 2026-04-12
 description: 用于写WP
 tags: [CTF, Writeup]

