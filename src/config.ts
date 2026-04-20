@@ -147,9 +147,9 @@ export const siteConfig: SiteConfig = {
 		},
 
 		waves: {
-			enable: false, // 是否启用水波纹效果（注意：此功能性能开销较大）
+			enable: true, // 是否启用水波纹效果（注意：此功能性能开销较大）
 			performanceMode: true, // 性能模式：减少动画复杂度(性能提升40%)
-			mobileDisable: true, // 移动端禁用
+			mobileDisable: false, // 移动端禁用
 		},
 
 		// PicFlow API支持(智能图片API)
