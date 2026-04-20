@@ -117,7 +117,3 @@
 		></canvas>
 	</div>
 {/if}
-
-<style>
-	/* Pio 相关样式将通过外部CSS文件加载 */
-</style>
