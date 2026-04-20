@@ -60,6 +60,9 @@ const position = config.position || "center";
 const zIndex = config.zIndex || -1;
 const opacity = config.opacity || 0.8;
 const blurAmount = config.blur || 0;
+const shouldPrioritizeWallpaper = siteConfig.wallpaperMode.defaultMode === "fullscreen";
+const firstWallpaperLoading = shouldPrioritizeWallpaper ? "eager" : "lazy";
+const firstWallpaperPriority = shouldPrioritizeWallpaper ? "high" : "low";
 const positionClass = (() => {
 	switch (position) {
 		case "top": return "object-top";
@@ -113,15 +116,15 @@ const renderGroups = [
 						data-carousel-item={index}
 						style={`transform: translateZ(0); backface-visibility: hidden; will-change: opacity; ${blurAmount > 0 ? `filter: blur(${blurAmount}px);` : ''}; opacity: ${index === 0 ? 1 : 0};`}
 						decoding="async"
-						loading={index === 0 ? "eager" : "lazy"}
-						fetchpriority={index === 0 ? "high" : undefined}
+						loading={index === 0 ? firstWallpaperLoading : "lazy"}
+						fetchpriority={index === 0 ? firstWallpaperPriority : undefined}
 					/>
 				))}
 			</div>
 		))
 	) : (
 		<div id="wallpaper-single-container" class="w-full h-full relative">
-			<script is:inline define:vars={{ desktopImages: imageSources.desktop, mobileImages: imageSources.mobile, positionClass, blurAmount }}>
+			<script is:inline define:vars={{ desktopImages: imageSources.desktop, mobileImages: imageSources.mobile, positionClass, blurAmount, firstWallpaperLoading, firstWallpaperPriority }}>
 				(function() {
 					const getRandomImage = (images, storageKey) => {
 						if (images.length === 0) {return null;}
@@ -154,8 +157,8 @@ const renderGroups = [
 								class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}"
 								style="transform: translateZ(0); backface-visibility: hidden; will-change: opacity; ${blurAmount > 0 ? `filter: blur(${blurAmount}px);` : ''} opacity: 1;"
 								decoding="async"
-								loading="eager"
-								fetchpriority="high"
+								loading="${firstWallpaperLoading}"
+								fetchpriority="${firstWallpaperPriority}"
 							/>
 						`;
 						container.appendChild(desktopDiv);
@@ -172,8 +175,8 @@ const renderGroups = [
 								class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}"
 								style="transform: translateZ(0); backface-visibility: hidden; will-change: opacity; ${blurAmount > 0 ? `filter: blur(${blurAmount}px);` : ''} opacity: 1;"
 								decoding="async"
-								loading="eager"
-								fetchpriority="high"
+								loading="${firstWallpaperLoading}"
+								fetchpriority="${firstWallpaperPriority}"
 							/>
 						`;
 						container.appendChild(mobileDiv);

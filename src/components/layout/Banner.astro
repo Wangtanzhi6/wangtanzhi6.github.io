@@ -66,6 +66,9 @@ const kbDurationMs = carouselIntervalMs + fadeMs;
 
 const hasBannerCredit = siteConfig.banner.credit.enable;
 const hasBannerLink = !!siteConfig.banner.credit.url;
+const wavePerformanceMode = siteConfig.banner.waves?.performanceMode ?? false;
+const waveMobileDisable = siteConfig.banner.waves?.mobileDisable ?? false;
+const waveContainerClass = `waves absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh] ${waveMobileDisable ? "hidden md:block" : ""}`;
 ---
 
 <div
@@ -629,7 +632,7 @@ const hasBannerLink = !!siteConfig.banner.credit.url;
 	<!-- 水波纹效果 -->
 	{showWave && (
 		<div
-			class="waves absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh]"
+			class={waveContainerClass}
 			id="header-waves"
 			style="transform: translateZ(0); will-change: fill;"
 		>
@@ -650,20 +653,24 @@ const hasBannerLink = !!siteConfig.banner.credit.url;
 					</path>
 				</defs>
 				<g class="parallax" style="transform: translateZ(0);">
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="0"
-						class="opacity-25 fill-[var(--page-bg)]"
-						style="animation-delay: -2s; animation-duration: 7s; will-change: transform;"
-					></use>
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="3"
-						class="opacity-50 fill-[var(--page-bg)]"
-						style="animation-delay: -3s; animation-duration: 10s; will-change: transform;"
-					></use>
+					{!wavePerformanceMode && (
+						<>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="0"
+								class="opacity-25 fill-[var(--page-bg)]"
+								style="animation-delay: -2s; animation-duration: 7s; will-change: transform;"
+							></use>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="3"
+								class="opacity-50 fill-[var(--page-bg)]"
+								style="animation-delay: -3s; animation-duration: 10s; will-change: transform;"
+							></use>
+						</>
+					)}
 					<use
 						xlink:href="#gentle-wave"
 						x="48"
