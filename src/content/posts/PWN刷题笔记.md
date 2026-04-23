@@ -140,7 +140,7 @@ r.interactive()
 ```
 ## ret2sys
 在做这题之前我们需要了解一下什么是`syscall`指令什么是`shellcode`：
-我自己的理解是，`syscall`可以执行一些用户在linux系统里没有能力或没有权限去执行的一些事情，并返回结果。可以理解为特殊的函数。具体的解释，以及如何使用`syscall`，可以看下这篇文章[SYSCALL 指令]('https://blog.csdn.net/qq_33060405/article/details/144361378')
+我自己的理解是，`syscall`可以执行一些用户在linux系统里没有能力或没有权限去执行的一些事情，并返回结果。可以理解为特殊的函数。具体的解释，以及如何使用`syscall`，可以看下这篇文章[SYSCALL 指令](https://blog.csdn.net/qq_33060405/article/details/144361378)
 `shellcode`就是一段可以获得shell或者实现特定功能的机器码。CTF里shellcode的目的就是最终执行execve("/bin/sh", 0, 0);
 再来看下题目（*因为这题是帮助我们先了解汇编语言、机器码...也就是`syscall`的概念的题，所以不过多的具体展开，~~感觉详细的解释一时半会真讲不清~~*）
 ![ret2sys](images/ret2sys.webp)
@@ -199,7 +199,7 @@ EOF(End Of File)了,EOF一般有以下几种原因：最常见的几种原因
 * 检测到非法输入
 * 只允许一次请求
 * 守护进程限制连接时长
-想到了之前做的一道题--xmm寄存器只有在rsp的末尾为0时才能正常执行，猜想大概率是栈对齐没做好的原因，我们就进入GDB里调试一下
+想到了之前做的一道题--xmm寄存器只有在rsp的末尾为0时才能正常执行，猜想大概率是栈对齐没做好的原因，我们进入GDB里调试一下看看
 ![ez3](images/eztext3.webp)
 果然，知道为什么程序出错就好办了，使用ROPgadget来找下ret的地址：
 ![ez4](images/eztext4.webp)
@@ -214,7 +214,7 @@ r.recvline()
 r.sendline(playload)
 r.interactive()
 ```
-果然可以了！但是怎么没有flag呢？`cat flag`找不到啊。
+果然可以了！但是怎么没有flag呢？`cat flag`也找不到啊。
 ![ez5](images/eztext5.webp)
 这种情况我们可以用`ls -la /bin`这种形式的命令来查看目录里的具体内容
 ![ez6](images/eztext6.webp)
