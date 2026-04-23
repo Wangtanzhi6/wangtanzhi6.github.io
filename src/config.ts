@@ -40,7 +40,7 @@ export const siteConfig: SiteConfig = {
 
 	// 特色页面开关配置（关闭未使用的页面有助于提升 SEO，关闭后请记得在 navbarConfig 中移除对应链接）
 	featurePages: {
-		anime: false,// 番剧页面开关
+		anime: false, // 番剧页面开关
 		diary: false, // 日记页面开关
 		friends: true, // 友链页面开关
 		projects: false, // 项目页面开关
@@ -165,11 +165,7 @@ export const siteConfig: SiteConfig = {
 			enable: true, // 在主页显示自定义文本
 			title: "谁还有多余资金", // 主页横幅主标题
 
-			subtitle: [
-				"品味不错我的朋友",
-				"这位置不错",
-				"离散？？"
-			],
+			subtitle: ["品味不错我的朋友", "这位置不错", "离散？？"],
 			typewriter: {
 				enable: true, // 启用副标题打字机效果
 
