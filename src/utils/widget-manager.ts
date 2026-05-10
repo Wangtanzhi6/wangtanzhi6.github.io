@@ -1,4 +1,4 @@
-import { sidebarLayoutConfig } from "../config";
+import { musicPlayerConfig, sidebarLayoutConfig } from "../config";
 import type {
 	SidebarLayoutConfig,
 	WidgetComponentConfig,
@@ -68,7 +68,14 @@ export class WidgetManager {
 			}
 		}
 
-		const componentTypes = this.config.components[activeSidebar] || [];
+		const componentTypes = (this.config.components[activeSidebar] || []).filter(
+			(type) => {
+				if (type === "music-player" || type === "music-sidebar") {
+					return musicPlayerConfig.enable;
+				}
+				return true;
+			},
+		);
 
 		return componentTypes
 			.map((type) => {
@@ -190,19 +197,27 @@ export class WidgetManager {
 	 * @param deviceType 设备类型
 	 */
 	shouldShowSidebar(deviceType: "mobile" | "tablet" | "desktop"): boolean {
+		const hasEnabledComponents = (components: WidgetComponentType[]) =>
+			components.some((type) => {
+				if (type === "music-player" || type === "music-sidebar") {
+					return musicPlayerConfig.enable;
+				}
+				return true;
+			});
+
 		if (deviceType === "mobile") {
-			return this.config.components.drawer.length > 0;
+			return hasEnabledComponents(this.config.components.drawer);
 		}
 		if (deviceType === "tablet") {
 			return (
-				this.config.components.left.length > 0 ||
-				this.config.components.right.length > 0
+				hasEnabledComponents(this.config.components.left) ||
+				hasEnabledComponents(this.config.components.right)
 			);
 		}
 		// desktop
 		return (
-			this.config.components.left.length > 0 ||
-			this.config.components.right.length > 0
+			hasEnabledComponents(this.config.components.left) ||
+			hasEnabledComponents(this.config.components.right)
 		);
 	}
 
@@ -286,6 +301,14 @@ export function isComponentEnabled(
 	componentType: WidgetComponentType,
 ): boolean {
 	const config = widgetManager.getConfig().components;
+	if (
+		(componentType === "music-player" ||
+			componentType === "music-sidebar") &&
+		!musicPlayerConfig.enable
+	) {
+		return false;
+	}
+
 	return (
 		config.left.includes(componentType) ||
 		config.right.includes(componentType) ||

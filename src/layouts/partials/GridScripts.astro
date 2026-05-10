@@ -143,7 +143,7 @@ const {
 
 		// 强制重排以确保样式正确应用
 		const forceReflow = function () {
-			void document.body.offsetHeight;
+			// Intentionally no-op: avoid synchronous layout reads during startup.
 		};
 
 		switch (wallpaperMode) {

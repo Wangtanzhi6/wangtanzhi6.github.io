@@ -225,6 +225,10 @@ class ThemeOptimizer {
 	// ==================== 代码块优化 ====================
 
 	initCodeBlockOptimization() {
+		if (!("IntersectionObserver" in window)) {
+			return;
+		}
+
 		// 创建 Intersection Observer 追踪可见代码块
 		this.codeBlockObserver = new IntersectionObserver(
 			(entries) => {
@@ -267,7 +271,17 @@ class ThemeOptimizer {
 		this.visibleBlocks.clear();
 
 		requestAnimationFrame(() => {
+			if (!this.codeBlockObserver) {
+				return;
+			}
+
+			this.codeBlockObserver.disconnect();
+
 			const codeBlocks = document.querySelectorAll(".expressive-code");
+			if (codeBlocks.length === 0) {
+				return;
+			}
+
 			codeBlocks.forEach((block) => {
 				this.codeBlockObserver.observe(block);
 
@@ -548,8 +562,27 @@ class ThemeOptimizer {
 	}
 }
 
-// 初始化优化器
-const themeOptimizer = new ThemeOptimizer();
+function initThemeOptimizer() {
+	if (window.themeOptimizer) {
+		return;
+	}
 
-// 导出到全局（统一API）
-window.themeOptimizer = themeOptimizer;
+	window.themeOptimizer = new ThemeOptimizer();
+}
+
+function scheduleThemeOptimizer() {
+	if ("requestIdleCallback" in window) {
+		window.requestIdleCallback(initThemeOptimizer, { timeout: 1500 });
+		return;
+	}
+
+	setTimeout(initThemeOptimizer, 300);
+}
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", scheduleThemeOptimizer, {
+		once: true,
+	});
+} else {
+	scheduleThemeOptimizer();
+}

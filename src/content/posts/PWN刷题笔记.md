@@ -219,3 +219,5 @@ r.interactive()
 这种情况我们可以用`ls -la /bin`这种形式的命令来查看目录里的具体内容
 ![ez6](images/eztext6.webp)
 最后我们再/bin/flag处发现flag，用cat bin/flag\n命令得到flag。
+## canary
+什么是canary？Canary 的核心原理可以一句话概括：在函数返回地址前面放一个随机值，函数返回前检查这个值有没有被改掉；如果被改了，就认为发生了栈溢出，直接终止程序。
