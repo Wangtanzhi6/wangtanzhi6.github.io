@@ -256,9 +256,9 @@ return address       ebp + 4
 在进入 printf 的时候：  
 esp = ebp - 0x8c  
 所以：  
-%1$p  读的位置是 ebp - 0x84  
-%2$p  读的位置是 ebp - 0x80  
-%3$p  读的位置是 ebp - 0x7c  
+`%1$p`读的位置是 ebp - 0x84  
+`%2$p`读的位置是 ebp - 0x80  
+`%3$p`读的位置是 ebp - 0x7c  
 ...  
 而 canary 在：  
 ebp - 0x0c  
