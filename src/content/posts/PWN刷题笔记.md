@@ -231,56 +231,56 @@ r.interactive()
 然后就是怎么泄漏canary了，我们需要知道Canary的地址，那怎么算呢？我们是可以通过汇编来算的(*汇编这一块我现在暂时还是没太搞懂*)，GPT是这么说的：
 先看关键汇编，vuln() 中和 canary、printf 相关的汇编是：
 ```python
-sub esp, 0x78
-
-mov eax, gs:0x14
-mov [ebp-0xc], eax        ; canary 保存在 ebp-0xc
-
-...
-
-lea eax, [ebp-0x70]       ; buf 地址
-push eax
-call printf
-```
-也就是说：
-buf    在 ebp - 0x70
-canary 在 ebp - 0x0c
-栈大概长这样：
-低地址
-buf                  ebp - 0x70
-...
-canary               ebp - 0x0c
-saved ebp            ebp
-return address       ebp + 4
-高地址
-在进入 printf 的时候：
-esp = ebp - 0x8c
-所以：
-%1$p  读的位置是 ebp - 0x84
-%2$p  读的位置是 ebp - 0x80
-%3$p  读的位置是 ebp - 0x7c
-...
-而 canary 在：
-ebp - 0x0c
-计算：
-第 1 个参数位置 = ebp - 0x84
-canary 位置     = ebp - 0x0c
-距离是：
-0x84 - 0x0c = 0x78
+sub esp, 0x78  
+  
+mov eax, gs:0x14  
+mov [ebp-0xc], eax        ; canary 保存在 ebp-0xc  
+  
+...  
+  
+lea eax, [ebp-0x70]       ; buf 地址  
+push eax  
+call printf  
+```  
+也就是说：  
+buf    在 ebp - 0x70  
+canary 在 ebp - 0x0c  
+栈大概长这样：  
+低地址  
+buf                  ebp - 0x70  
+...  
+canary               ebp - 0x0c  
+saved ebp            ebp  
+return address       ebp + 4  
+高地址  
+在进入 printf 的时候：  
+esp = ebp - 0x8c  
+所以：  
+%1$p  读的位置是 ebp - 0x84  
+%2$p  读的位置是 ebp - 0x80  
+%3$p  读的位置是 ebp - 0x7c  
+...  
+而 canary 在：  
+ebp - 0x0c  
+计算：  
+第 1 个参数位置 = ebp - 0x84  
+canary 位置     = ebp - 0x0c  
+距离是：  
+0x84 - 0x0c = 0x78  
 每个参数在 32 位程序里占 4 字节，所以：0x78 / 4 = 30。因为 %1$p 是第一个位置，所以：1 + 30 = 31，因此 canary 正好是：%31$p
 ![canary](images/canary2.webp)
-算出偏移(~~应该可以这么说吧？~~)后我们就可以写exp来拿shell了。
-我们还要注意栈里的结构是这样的(主要是经典 32 位 x86 程序的调用约定（cdecl）决定的):
-buf
-canary
-padding (8 bytes)
-saved ebp
-return address
-因此payload 结构：
-0x64 bytes   -> 填满 buf
-4 bytes      -> 正确 canary
-12 bytes     -> padding + saved ebp
-4 bytes      -> 覆盖返回地址
+算出偏移(~~应该可以这么说吧？~~)后我们就可以写exp来拿shell了。  
+我们还要注意栈里的结构是这样的(主要是经典 32 位 x86 程序的调用约定（cdecl）决定的):  
+buf  
+canary  
+padding (8 bytes)  
+saved ebp  
+return address  
+因此payload 结构：  
+0x64 bytes   -> 填满 buf  
+4 bytes      -> 正确 canary  
+12 bytes     -> padding + saved ebp  
+4 bytes      -> 覆盖返回地址  
 所以最终exp应该这么写：
 ```python
 from pwn import *
