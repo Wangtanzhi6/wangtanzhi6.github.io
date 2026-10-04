@@ -267,6 +267,7 @@ export const navBarConfig: NavBarConfig = {
 	links: [
 		LinkPreset.Home,
 		LinkPreset.Archive,
+		LinkPreset.Friends,
 		// 支持自定义导航栏链接，支持多级菜单
 		{
 			name: "Links",
