@@ -36,6 +36,39 @@ export const friendsData: FriendItem[] = [
 		siteurl: "https://blog.timmy.host/",
 		tags: ["博客"],
 	},
+	{
+		id: 12,
+		title: "C3ngH",
+		imgurl: "/images/friends/c3ngh.jpg",
+		desc: "允许一切如其所是",
+		siteurl: "https://c3ngh.top/",
+		tags: ["博客", "学长"],
+	},
+	{
+		id: 13,
+		title: "A1ic3's House",
+		imgurl: "/images/friends/a1ic3.jpg",
+		desc: "Every adventure requires a first setups",
+		siteurl: "https://a1ic3.cn/",
+		tags: ["博客", "学长"],
+	},
+	{
+		id: 14,
+		title: "温婳霂",
+		imgurl: "/images/friends/somokel.webp",
+		desc: "I MEET YOU HERE.",
+		siteurl: "https://somokel.github.io/",
+		tags: ["博客", "学长"],
+	},
+	{
+		id: 15,
+		title: "sanitietatuji",
+		// 网站暂时返回 404，待确认地址后替换为网站头像。
+		imgurl: "/images/friends/sanitietatuji.svg",
+		desc: "学长的个人博客",
+		siteurl: "https://sanitietatuji.github.io/",
+		tags: ["博客", "学长"],
+	},
 ];
 
 // 获取所有友情链接数据
